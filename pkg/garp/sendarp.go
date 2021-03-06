@@ -1,4 +1,4 @@
-package fakearp
+package garp
 
 import (
 	"github.com/google/gopacket"
@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	handleMutex sync.Mutex = sync.Mutex{}
+	handleMutex = sync.Mutex{}
 )
 
 //send a arp reply from srcIp to dstIP

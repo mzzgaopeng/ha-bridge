@@ -1,8 +1,8 @@
-package ha
+package failover
 
 import (
 	"github.com/google/gopacket/pcap"
-	"ha-bridge/pkg/fakearp"
+	"ha-bridge/pkg/garp"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	v1 "kubevirt.io/client-go/api/v1"
@@ -17,6 +17,8 @@ var virtInformer cache.SharedIndexInformer
 const indexName = "node"
 
 const bridgeNetwork = "vlan"
+
+const broadcastMacStr = "ff:ff:ff:ff:ff:ff"
 
 var hostname = "10.100.100.148-share"
 
@@ -36,12 +38,11 @@ func sendGarp(macstr, ipstr, linkBridgeOnHost string) {
 	if err != nil {
 		klog.Error(err)
 	}
-	broadcastMac, err := net.ParseMAC("ff:ff:ff:ff:ff:ff")
+	broadcastMac, err := net.ParseMAC(broadcastMacStr)
 	if err != nil {
 		klog.Error(err)
 	}
-	fakearp.SendAFakeArpRequest(handle, src, src, broadcastMac, mac)
-
+	garp.SendAFakeArpRequest(handle, src, src, broadcastMac, mac)
 }
 
 func getAllLocalVMList() []v1.VirtualMachineInstance {
