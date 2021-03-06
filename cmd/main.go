@@ -18,7 +18,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"ha-bridge/pkg/bond"
+	"ha-bridge/pkg/failover"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/tools/cache"
 	"log"
@@ -27,7 +28,6 @@ import (
 	"time"
 
 	k8sv1 "k8s.io/api/core/v1"
-	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 	kubev1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
@@ -43,12 +43,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot obtain KubeVirt client: %v\n", err)
 	}
-	// Fetch list of VMs & VMIs
-	vmList, err := virtClientSet.VirtualMachineInstance("default").List(&k8smetav1.ListOptions{})
-	if err != nil {
-		log.Fatalf("cannot obtain KubeVirt vm list: %v\n", err)
-	}
-	fmt.Println(vmList.Items[0])
+
 	lw := cache.NewListWatchFromClient(virtClientSet.RestClient(), "virtualmachineinstances", k8sv1.NamespaceAll, fields.Everything())
 	kubvirtInformer := cache.NewSharedIndexInformer(lw, &kubev1.VirtualMachineInstance{}, resyncPeriod(12*time.Hour), cache.Indexers{
 		cache.NamespaceIndex: cache.MetaNamespaceIndexFunc,
@@ -56,17 +51,10 @@ func main() {
 			return []string{obj.(*kubev1.VirtualMachineInstance).Status.NodeName}, nil
 		},
 	})
-
-	controller := NewController(virtClientSet, kubvirtInformer)
-
-	// notice that there is no need to run Start methods in a separate goroutine. (i.e. go kubeInformerFactory.Start(stopCh)
-	// Start method is non-blocking and runs all registered informers in a dedicated goroutine.
-
+	failover.VirtInformer = &kubvirtInformer
 	go kubvirtInformer.Run(stopCh)
+	go bond.Start()
 
-	if err = controller.Run(2, stopCh); err != nil {
-		klog.Fatalf("Error running controller: %s", err.Error())
-	}
 }
 
 // resyncPeriod computes the time interval a shared informer waits before resyncing with the api server

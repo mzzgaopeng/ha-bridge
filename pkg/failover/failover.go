@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var virtInformer cache.SharedIndexInformer
+var VirtInformer *cache.SharedIndexInformer
 
 const indexName = "node"
 
@@ -47,7 +47,7 @@ func sendGarp(macstr, ipstr, linkBridgeOnHost string) {
 
 func getAllLocalVMList() []v1.VirtualMachineInstance {
 	var result []v1.VirtualMachineInstance
-	obj, err := virtInformer.GetIndexer().ByIndex(indexName, hostname)
+	obj, err := VirtInformer.GetIndexer().ByIndex(indexName, hostname)
 
 	if err != nil {
 		klog.Fatal(err)
