@@ -12,21 +12,24 @@ import (
 	"time"
 )
 
-var VirtInformer *cache.SharedIndexInformer
+var VirtInformer cache.SharedIndexInformer
 
 const indexName = "node"
 
-const bridgeNetwork = "vlan"
+const bridgeNetwork = "kubevirt-bridge"
 
 const broadcastMacStr = "ff:ff:ff:ff:ff:ff"
 
 var hostname = "10.100.100.148-share"
 
 func OnBondFailOver() {
+	klog.Infoln("bond fail over.....")
 	vmList := getAllLocalVMList()
 	handleVMI(vmList)
 
 }
+
+//todo benchmark
 func sendGarp(macstr, ipstr, linkBridgeOnHost string) {
 	handle, err := pcap.OpenLive(linkBridgeOnHost, 65536, true, 3*time.Millisecond)
 	if err != nil {
@@ -59,8 +62,10 @@ func getAllLocalVMList() []v1.VirtualMachineInstance {
 	}
 	return result
 }
+
+//TODO get vlan with ip from ipam cr
 func getBridgeOnHOst() string {
-	return ""
+	return "vlan315"
 }
 
 func handleVMI(vmList []v1.VirtualMachineInstance) {

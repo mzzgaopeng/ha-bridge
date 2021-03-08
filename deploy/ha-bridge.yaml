@@ -1,0 +1,55 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: habridge
+  namespace: kube-system
+  labels:
+    k8s-app: habridge
+spec:
+  selector:
+    matchLabels:
+      k8s-app: habridge
+  template:
+    metadata:
+      labels:
+        k8s-app: habridge
+    spec:
+      hostNetwork: true
+      tolerations:
+        # Make sure hcmacvlan/node gets scheduled on all nodes.
+        - effect: NoSchedule
+          operator: Exists
+      serviceAccountName:  habridge
+      containers:
+        # This container installs the hcmacvlan binaries
+        # and CNI network config file on each node.
+        - name: habridge
+          image: 10.100.100.200/k8s-deploy/habridge:v1.0
+          imagePullPolicy: Always
+          securityContext:
+            capabilities:clear
+
+              add:
+                - NET_ADMIN
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: habridge-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubevirt.io:view
+subjects:
+  - kind: ServiceAccount
+    name: habridge
+    namespace: kube-system
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: habridge
+  namespace: kube-system

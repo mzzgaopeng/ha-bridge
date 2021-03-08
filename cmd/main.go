@@ -20,21 +20,21 @@ import (
 	"flag"
 	"ha-bridge/pkg/bond"
 	"ha-bridge/pkg/failover"
+	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/tools/cache"
-	"log"
-	"os"
-	"os/signal"
-	"time"
-
-	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 	kubev1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
+	"log"
 	"math/rand"
+	"os"
+	"os/signal"
+	"time"
 )
 
 func main() {
+	klog.Infoln("start habridge......")
 	klog.InitFlags(nil)
 	flag.Parse()
 	// set up signals so we handle the first shutdown signal gracefully
@@ -44,6 +44,7 @@ func main() {
 		log.Fatalf("cannot obtain KubeVirt client: %v\n", err)
 	}
 
+	klog.Infoln("create informer......")
 	lw := cache.NewListWatchFromClient(virtClientSet.RestClient(), "virtualmachineinstances", k8sv1.NamespaceAll, fields.Everything())
 	kubvirtInformer := cache.NewSharedIndexInformer(lw, &kubev1.VirtualMachineInstance{}, resyncPeriod(12*time.Hour), cache.Indexers{
 		cache.NamespaceIndex: cache.MetaNamespaceIndexFunc,
@@ -51,9 +52,11 @@ func main() {
 			return []string{obj.(*kubev1.VirtualMachineInstance).Status.NodeName}, nil
 		},
 	})
-	failover.VirtInformer = &kubvirtInformer
+	failover.VirtInformer = kubvirtInformer
+	klog.Infoln("start  informer......")
 	go kubvirtInformer.Run(stopCh)
-	go bond.Start()
+	klog.Infoln("start netlink listener ......")
+	bond.Start()
 
 }
 
@@ -63,22 +66,6 @@ func resyncPeriod(minResyncPeriod time.Duration) time.Duration {
 	factor := rand.Float64() + 1
 	return time.Duration(float64(minResyncPeriod.Nanoseconds()) * factor)
 }
-
-/*
-Copyright 2017 The Kubernetes Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 
 var onlyOneSignalHandler = make(chan struct{})
 

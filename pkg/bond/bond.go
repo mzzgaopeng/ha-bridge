@@ -3,6 +3,7 @@ package bond
 import (
 	"fmt"
 	"ha-bridge/pkg/failover"
+	"k8s.io/klog/v2"
 	"net"
 	"strings"
 	"syscall"
@@ -16,7 +17,11 @@ func Start() {
 }
 
 func GetNotifyArp(bond string) {
-	l, _ := ListenNetlink()
+	l, err := ListenNetlink()
+	if err != nil {
+		klog.Error(err)
+		return
+	}
 
 	for {
 		msgs, err := l.ReadMsgs()
