@@ -26,7 +26,7 @@ func GetNotifyArp(bond string) {
 	for {
 		msgs, err := l.ReadMsgs()
 		if err != nil {
-			fmt.Printf("Could not read netlink:\n %s", err) // can't find this netlink
+			klog.Error("Could not read netlink:\n %s", err) // can't find this netlink
 		}
 	loop:
 		for _, m := range msgs {
@@ -36,7 +36,7 @@ func GetNotifyArp(bond string) {
 			case syscall.RTM_NEWLINK, syscall.RTM_DELLINK: // get netlink message
 				res, err := PrintLinkMsg(&m)
 				if err != nil {
-					fmt.Printf("Could not find netlink %s\n", err)
+					klog.Error("Could not find netlink ", err)
 				} else {
 					ethInfo := strings.Fields(res)
 					if ethInfo[2] == bond && ethInfo[1] == "up" {

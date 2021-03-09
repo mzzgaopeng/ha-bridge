@@ -6,7 +6,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	v1 "kubevirt.io/client-go/api/v1"
-	"log"
 	"net"
 	"strings"
 	"time"
@@ -25,15 +24,20 @@ var hostname = "10.100.100.148-share"
 func OnBondFailOver() {
 	klog.Infoln("bond fail over.....")
 	vmList := getAllLocalVMList()
+	if vmList == nil || len(vmList) == 0 {
+		klog.Infof("can not find vmi on node %s", hostname)
+
+	}
 	handleVMI(vmList)
 
 }
 
 //todo benchmark
 func sendGarp(macstr, ipstr, linkBridgeOnHost string) {
+	klog.Infof("send gratuitous arp from ip:%s ,mac:%s  on  interface: %s ", ipstr, macstr, linkBridgeOnHost)
 	handle, err := pcap.OpenLive(linkBridgeOnHost, 65536, true, 3*time.Millisecond)
 	if err != nil {
-		log.Fatal(err)
+		klog.Fatal(err)
 	}
 	defer handle.Close()
 	src := net.ParseIP(ipstr)
@@ -75,7 +79,7 @@ func handleVMI(vmList []v1.VirtualMachineInstance) {
 				mac := intf.MAC
 				ip := intf.IP
 				linkBridgeOnHost := getBridgeOnHOst()
-				sendGarp(mac, ip, linkBridgeOnHost)
+				go sendGarp(mac, ip, linkBridgeOnHost)
 			}
 		}
 	}
