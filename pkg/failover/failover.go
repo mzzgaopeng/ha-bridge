@@ -15,17 +15,15 @@ var VirtInformer cache.SharedIndexInformer
 
 const indexName = "node"
 
-const bridgeNetwork = "kubevirt-bridge"
-
 const broadcastMacStr = "ff:ff:ff:ff:ff:ff"
 
-var hostname = "10.100.100.148-share"
+var HOST_NAME string
 
 func OnBondFailOver() {
 	klog.Infoln("bond fail over.....")
 	vmList := getAllLocalVMList()
 	if vmList == nil || len(vmList) == 0 {
-		klog.Infof("can not find vmi on node %s", hostname)
+		klog.Infof("can not find vmi on node %s", HOST_NAME)
 
 	}
 	handleVMI(vmList)
@@ -54,7 +52,7 @@ func sendGarp(macstr, ipstr, linkBridgeOnHost string) {
 
 func getAllLocalVMList() []v1.VirtualMachineInstance {
 	var result []v1.VirtualMachineInstance
-	obj, err := VirtInformer.GetIndexer().ByIndex(indexName, hostname)
+	obj, err := VirtInformer.GetIndexer().ByIndex(indexName, HOST_NAME)
 
 	if err != nil {
 		klog.Fatal(err)
@@ -74,8 +72,10 @@ func getBridgeOnHOst() string {
 
 func handleVMI(vmList []v1.VirtualMachineInstance) {
 	for _, vm := range vmList {
+		klog.Infoln("get vm  ", vm.Name)
 		for _, intf := range vm.Status.Interfaces {
-			if strings.Contains(intf.Name, bridgeNetwork) {
+			if strings.Contains(intf.InterfaceName, "eth") {
+				klog.Infoln("get vm has eth0  ", vm.Name)
 				mac := intf.MAC
 				ip := intf.IP
 				linkBridgeOnHost := getBridgeOnHOst()

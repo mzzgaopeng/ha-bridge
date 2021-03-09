@@ -26,7 +26,6 @@ import (
 	"k8s.io/klog/v2"
 	kubev1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
-	"log"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -37,11 +36,13 @@ func main() {
 	klog.Infoln("start habridge......")
 	klog.InitFlags(nil)
 	flag.Parse()
+	failover.HOST_NAME = os.Getenv("HOST_NAME")
+	klog.Infoln("get nodename ", failover.HOST_NAME)
 	// set up signals so we handle the first shutdown signal gracefully
 	stopCh := SetupSignalHandler()
 	virtClientSet, err := kubecli.GetKubevirtClient()
 	if err != nil {
-		log.Fatalf("cannot obtain KubeVirt client: %v\n", err)
+		klog.Fatalf("cannot obtain KubeVirt client: %v\n", err)
 	}
 
 	klog.Infoln("create informer......")
