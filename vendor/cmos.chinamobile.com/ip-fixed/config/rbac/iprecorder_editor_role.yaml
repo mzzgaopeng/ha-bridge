@@ -1,0 +1,24 @@
+# permissions for end users to edit iprecorders.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: iprecorder-editor-role
+rules:
+- apiGroups:
+  - ipfixed.cmos.chinamobile.com
+  resources:
+  - iprecorders
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ipfixed.cmos.chinamobile.com
+  resources:
+  - iprecorders/status
+  verbs:
+  - get

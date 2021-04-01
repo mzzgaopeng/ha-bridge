@@ -1,0 +1,82 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.5
+  creationTimestamp: null
+  name: ippooldetails.ipfixed.cmos.chinamobile.com
+spec:
+  group: ipfixed.cmos.chinamobile.com
+  names:
+    kind: IPPoolDetail
+    listKind: IPPoolDetailList
+    plural: ippooldetails
+    singular: ippooldetail
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      description: IPPoolDetail is the Schema for the ippooldetails API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: IPPoolDetailSpec defines the desired state of IPPoolDetail
+          properties:
+            allocations:
+              description: 'The IP address index of the IPPool. null indicates that
+                the ip corresponding to the index is not occupied. If it is not null,
+                it means that the ip has been used, such as 0 means 192.168.2.1 has
+                been used. PS: After make manifests and before make install, you need
+                to modify config/crd/bases/ipfixed.cmos.chinamobile.com_ippooldetails.yaml,
+                spec.validation.openAPIV3Schema.properties.spec.properties.allocations.items.nullable:
+                true.'
+              items:
+                type: integer
+                nullable: true
+              type: array
+            cidr:
+              description: The spec.cidr of the IPPool.
+              type: string
+            recorders:
+              description: The specific situation of ip occupied in IPPool. IPRecorder
+                name array.
+              items:
+                type: string
+              type: array
+            unallocated:
+              description: Indicates the unallocated IP index, such as 2 means 192.168.2.3
+                can be used.
+              items:
+                type: integer
+              type: array
+            vlan:
+              description: The spec.vlan of the IPPool. The valid range is 1-4094.
+              type: integer
+          type: object
+        status:
+          description: IPPoolDetailStatus defines the observed state of IPPoolDetail
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

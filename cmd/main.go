@@ -17,12 +17,18 @@ limitations under the License.
 package main
 
 import (
+	v2 "cmos.chinamobile.com/ip-fixed/api/ipfixed/v1alpha1"
+	ipfixedclientset "cmos.chinamobile.com/ip-fixed/generated/ipfixed/clientset/versioned"
+	ipaminformers "cmos.chinamobile.com/ip-fixed/generated/ipfixed/informers/externalversions"
 	"flag"
+	"fmt"
 	"ha-bridge/pkg/bond"
 	"ha-bridge/pkg/failover"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 	kubev1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
@@ -44,6 +50,12 @@ func main() {
 	if err != nil {
 		klog.Fatalf("cannot obtain KubeVirt client: %v\n", err)
 	}
+	kubeConfig, err := clientcmd.BuildConfigFromFlags("", "")
+	ipfixedClient, err := ipfixedclientset.NewForConfig(kubeConfig)
+	if err != nil {
+		klog.Fatalf("cannot obtain Ipam client: %v\n", err)
+	}
+	//ipfixedClient.IpfixedV1alpha1()
 
 	klog.Infoln("create informer......")
 	lw := cache.NewListWatchFromClient(virtClientSet.RestClient(), "virtualmachineinstances", k8sv1.NamespaceAll, fields.Everything())
@@ -54,8 +66,20 @@ func main() {
 		},
 	})
 	failover.VirtInformer = kubvirtInformer
+	ipfixedInformerFactory := ipaminformers.NewSharedInformerFactory(ipfixedClient, time.Second*30)
+	ipamInformer := ipfixedInformerFactory.Ipfixed().V1alpha1().IPRecorders().Informer()
+	ipamInformer.AddIndexers(cache.Indexers{"ipaddress": func(obj interface{}) (strings []string, e error) {
+			return []string{obj.(*v2.IPRecorder).IPLists[0].IPAddress}, nil
+		},
+	})
 	klog.Infoln("start  informer......")
 	go kubvirtInformer.Run(stopCh)
+	go ipamInformer.Run(stopCh)
+	if !cache.WaitForCacheSync(stopCh, ipamInformer.HasSynced) {
+		runtime.HandleError(fmt.Errorf("Timed out waiting for ipam caches to sync"))
+		return
+	}
+	failover.IpamInformer = ipamInformer
 	klog.Infoln("start netlink listener ......")
 	bond.Start()
 

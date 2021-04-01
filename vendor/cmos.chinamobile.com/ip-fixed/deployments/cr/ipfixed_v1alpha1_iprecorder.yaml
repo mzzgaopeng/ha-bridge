@@ -1,0 +1,14 @@
+apiVersion: ipfixed.cmos.chinamobile.com/v1alpha1
+kind: IPRecorder
+metadata:
+  name: k8s-pod-network.vm.default.vm-1
+IPLists:
+  - pool: hn-idm-cidr
+    ipAddress: 192.168.2.4
+    gateway: 192.168.2.1
+    index: 3
+    resources: vm
+    namespace: default
+    name: vm-1
+    vlan: 1234
+    released: false

@@ -4,5 +4,5 @@
 export CGO_ENABLED="1"
 go build -o habridge ./cmd/
 md5sum habridge
-docker build -t 10.100.100.200/k8s-deploy/habridge:v1.0 .
-docker push 10.100.100.200/k8s-deploy/habridge:v1.0
+docker build -t 192.168.29.235:30443/k8s-deploy/habridge:v1.5 .
+docker save -o habridge.tar 192.168.29.235:30443/k8s-deploy/habridge:v1.5

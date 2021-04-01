@@ -1,0 +1,13 @@
+domain: cmos.chinamobile.com
+repo: cmos.chinamobile.com/ip-fixed
+resources:
+- group: ipfixed
+  kind: IPPool
+  version: v1alpha1
+- group: ipfixed
+  kind: IPPoolDetail
+  version: v1alpha1
+- group: ipfixed
+  kind: IPRecorder
+  version: v1alpha1
+version: "2"

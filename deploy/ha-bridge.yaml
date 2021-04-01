@@ -19,16 +19,15 @@ spec:
         # Make sure hcmacvlan/node gets scheduled on all nodes.
         - effect: NoSchedule
           operator: Exists
-      serviceAccountName:  habridge
+      serviceAccountName:  default
       containers:
         # This container installs the hcmacvlan binaries
         # and CNI network config file on each node.
         - name: habridge
-          image: 10.100.100.200/k8s-deploy/habridge:v1.0
+          image: 192.168.29.235:30443/k8s-deploy/habridge:v1.5
           imagePullPolicy: Always
           securityContext:
-            capabilities:clear
-
+            capabilities:
               add:
                 - NET_ADMIN
 

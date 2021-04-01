@@ -1,0 +1,82 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.5
+  creationTimestamp: null
+  name: iprecorders.ipfixed.cmos.chinamobile.com
+spec:
+  group: ipfixed.cmos.chinamobile.com
+  names:
+    kind: IPRecorder
+    listKind: IPRecorderList
+    plural: iprecorders
+    singular: iprecorder
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      description: IPRecorder is the Schema for the iprecorders API
+      properties:
+        IPLists:
+          description: Spec   IPRecorderSpec   `json:"spec,omitempty"`
+          items:
+            properties:
+              gateway:
+                description: The spec.gateway of the IPPool.
+                type: string
+              index:
+                description: Index of the recorded IPAddress. For example, 3 means
+                  192.168.2.4.
+                type: integer
+              ipAddress:
+                description: Recorded IP Address.
+                type: string
+              name:
+                type: string
+              namespace:
+                type: string
+              pool:
+                description: The name of the IPPool.
+                type: string
+              released:
+                description: Indicates whether the pod of the current ip has released
+                  the ip, but this value cannot be used as the basis for controller
+                  recovery.
+                type: boolean
+              resources:
+                description: Record the resource information of the current IPAddress.
+                type: string
+              vlan:
+                description: The spec.vlan of the IPPool. The valid range is 1-4094.
+                type: integer
+            type: object
+          type: array
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        status:
+          description: IPRecorderStatus defines the observed state of IPRecorder
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

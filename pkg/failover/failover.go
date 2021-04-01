@@ -1,17 +1,21 @@
 package failover
 
 import (
+	v2 "cmos.chinamobile.com/ip-fixed/api/ipfixed/v1alpha1"
+	"fmt"
 	"github.com/google/gopacket/pcap"
 	"ha-bridge/pkg/garp"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	v1 "kubevirt.io/client-go/api/v1"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 )
 
 var VirtInformer cache.SharedIndexInformer
+var IpamInformer cache.SharedIndexInformer
 
 const indexName = "node"
 
@@ -65,9 +69,27 @@ func getAllLocalVMList() []v1.VirtualMachineInstance {
 	return result
 }
 
+func getipvlan(ip string) (string, error) {
+	obj, err := IpamInformer.GetIndexer().ByIndex("ipaddress", ip)
+	if err != nil {
+		klog.Fatal(err)
+	}
+	if len(obj) == 1 {
+		result := strconv.Itoa(obj[0].(*v2.IPRecorder).IPLists[0].Vlan)
+		return result,nil
+	} else{
+		return ip, fmt.Errorf("count find ip is %s",ip)
+	}
+}
+
 //TODO get vlan with ip from ipam cr
-func getBridgeOnHOst() string {
-	return "vlan315"
+func getBridgeOnHOst(ip string) (string) {
+	vlanid, err := getipvlan(ip)
+	if err != nil {
+		klog.Fatal(err)
+	}
+	result := fmt.Sprint("vlan", vlanid)
+	return result
 }
 
 func handleVMI(vmList []v1.VirtualMachineInstance) {
@@ -78,7 +100,7 @@ func handleVMI(vmList []v1.VirtualMachineInstance) {
 				klog.Infoln("get vm has eth0  ", vm.Name)
 				mac := intf.MAC
 				ip := intf.IP
-				linkBridgeOnHost := getBridgeOnHOst()
+				linkBridgeOnHost := getBridgeOnHOst(ip)
 				go sendGarp(mac, ip, linkBridgeOnHost)
 			}
 		}

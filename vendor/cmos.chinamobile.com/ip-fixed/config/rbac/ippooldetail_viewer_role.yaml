@@ -1,0 +1,20 @@
+# permissions for end users to view ippooldetails.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ippooldetail-viewer-role
+rules:
+- apiGroups:
+  - ipfixed.cmos.chinamobile.com
+  resources:
+  - ippooldetails
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ipfixed.cmos.chinamobile.com
+  resources:
+  - ippooldetails/status
+  verbs:
+  - get

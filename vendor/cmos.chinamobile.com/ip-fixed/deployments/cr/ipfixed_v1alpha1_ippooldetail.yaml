@@ -1,0 +1,18 @@
+apiVersion: ipfixed.cmos.chinamobile.com/v1alpha1
+kind: IPPoolDetail
+metadata:
+  name: hn-idm-cidr
+spec:
+  cidr: 192.168.2.0/24
+  vlan: 1234
+  allocations:
+    - 0
+    - 1
+    - null
+    - 254
+  unallocated:
+    - 2
+    - 7
+    - 8
+  recorders:
+    - k8s-pod-network.vm.default.vm-1
