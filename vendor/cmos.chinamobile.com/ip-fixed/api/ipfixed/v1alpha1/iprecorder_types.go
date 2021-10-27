@@ -41,6 +41,8 @@ type IPRecorderIPLists struct {
 	Name      string `json:"name,omitempty"`
 	// The spec.vlan of the IPPool. The valid range is 1-4094.
 	Vlan int `json:"vlan,omitempty"`
+	// The address segment of the IPPool, the cidr method indicates
+	Cidr string `json:"cidr,omitempty"`
 	// Indicates whether the pod of the current ip has released the ip, but this value cannot be used as the basis for controller recovery.
 	Released bool `json:"released,omitempty"`
 }

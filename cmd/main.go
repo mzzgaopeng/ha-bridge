@@ -51,6 +51,9 @@ func main() {
 		klog.Fatalf("cannot obtain KubeVirt client: %v\n", err)
 	}
 	kubeConfig, err := clientcmd.BuildConfigFromFlags("", "")
+	if err != nil {
+		klog.Fatalf("cannot obtain kube client: %v\n", err)
+	}
 	ipfixedClient, err := ipfixedclientset.NewForConfig(kubeConfig)
 	if err != nil {
 		klog.Fatalf("cannot obtain Ipam client: %v\n", err)
@@ -69,8 +72,8 @@ func main() {
 	ipfixedInformerFactory := ipaminformers.NewSharedInformerFactory(ipfixedClient, time.Second*30)
 	ipamInformer := ipfixedInformerFactory.Ipfixed().V1alpha1().IPRecorders().Informer()
 	ipamInformer.AddIndexers(cache.Indexers{"ipaddress": func(obj interface{}) (strings []string, e error) {
-			return []string{obj.(*v2.IPRecorder).IPLists[0].IPAddress}, nil
-		},
+		return []string{obj.(*v2.IPRecorder).IPLists[0].IPAddress}, nil
+	},
 	})
 	klog.Infoln("start  informer......")
 	go kubvirtInformer.Run(stopCh)
