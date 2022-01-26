@@ -10,7 +10,6 @@ import (
 	v1 "kubevirt.io/client-go/api/v1"
 	"net"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -76,14 +75,14 @@ func getipvlan(ip string) (string, error) {
 	}
 	if len(obj) == 1 {
 		result := strconv.Itoa(obj[0].(*v2.IPRecorder).IPLists[0].Vlan)
-		return result,nil
-	} else{
-		return ip, fmt.Errorf("count find ip is %s",ip)
+		return result, nil
+	} else {
+		return ip, fmt.Errorf("coun't find ip is %s", ip)
 	}
 }
 
 //TODO get vlan with ip from ipam cr
-func getBridgeOnHOst(ip string) (string) {
+func getBridgeOnHOst(ip string) string {
 	vlanid, err := getipvlan(ip)
 	if err != nil {
 		klog.Fatal(err)
@@ -96,13 +95,39 @@ func handleVMI(vmList []v1.VirtualMachineInstance) {
 	for _, vm := range vmList {
 		klog.Infoln("get vm  ", vm.Name)
 		for _, intf := range vm.Status.Interfaces {
-			if strings.Contains(intf.InterfaceName, "eth") {
+			if intf.InterfaceName == "eth0" {
+				//if strings.Contains(intf.InterfaceName, "eth") {
 				klog.Infoln("get vm has eth0  ", vm.Name)
 				mac := intf.MAC
-				ip := intf.IP
-				linkBridgeOnHost := getBridgeOnHOst(ip)
-				go sendGarp(mac, ip, linkBridgeOnHost)
+				hasVlanip := intf.IP
+				ip := intf.IPs
+				linkBridgeOnHost := getBridgeOnHOst(hasVlanip)
+				for _, vmip := range ip {
+					Ipfamily := ipfamily(vmip)
+					switch Ipfamily {
+					case 4:
+						go sendGarp(mac, vmip, linkBridgeOnHost)
+					}
+				}
+				//linkBridgeOnHost := getBridgeOnHOst(hasVlanip)
+				//go sendGarp(mac, hasVlanip, linkBridgeOnHost)
 			}
 		}
 	}
+}
+
+func ipfamily(s string) int {
+	ip := net.ParseIP(s)
+	if ip == nil {
+		return 0
+	}
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case '.':
+			return 4
+		case ':':
+			return 6
+		}
+	}
+	return 0
 }
