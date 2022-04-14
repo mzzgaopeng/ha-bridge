@@ -54,8 +54,8 @@ github.com/go-stack/stack
 ## explicit; go 1.15
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
-# github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-## explicit
+# github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b => ./src/github.com/golang/glog
+## explicit; go 1.12
 github.com/golang/glog
 # github.com/golang/mock v1.3.1
 ## explicit
@@ -375,10 +375,10 @@ k8s.io/client-go/util/flowcontrol
 k8s.io/client-go/util/homedir
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/retry
-# k8s.io/klog v1.0.0
+# k8s.io/klog v1.0.0 => k8s.io/klog v0.4.0
 ## explicit; go 1.12
 k8s.io/klog
-# k8s.io/klog/v2 v2.6.0 => k8s.io/klog/v2 v2.6.0
+# k8s.io/klog/v2 v2.2.0 => k8s.io/klog/v2 v2.6.0
 ## explicit; go 1.13
 k8s.io/klog/v2
 # k8s.io/kube-openapi v0.0.0-20200410145947-61e04a5be9a6 => k8s.io/kube-openapi v0.0.0-20191107075043-30be4d16710a
@@ -440,6 +440,7 @@ sigs.k8s.io/yaml
 # github.com/googleapis/gnostic => github.com/googleapis/gnostic v0.3.1
 # cmos.chinamobile.com/ip-fixed => ./cmos.chinamobile.com/ip-fixed
 # github.com/go-kit/kit => github.com/go-kit/kit v0.3.0
+# github.com/golang/glog => ./src/github.com/golang/glog
 # github.com/openshift/api => github.com/openshift/api v0.0.0-20191219222812-2987a591a72c
 # github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20191125132246-f6563a70e19a
 # github.com/operator-framework/operator-lifecycle-manager => github.com/operator-framework/operator-lifecycle-manager v0.0.0-20190128024246-5eb7ae5bdb7a
@@ -455,6 +456,7 @@ sigs.k8s.io/yaml
 # k8s.io/component-base => k8s.io/component-base v0.16.4
 # k8s.io/cri-api => k8s.io/cri-api v0.16.4
 # k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.16.4
+# k8s.io/klog => k8s.io/klog v0.4.0
 # k8s.io/klog/v2 => k8s.io/klog/v2 v2.6.0
 # k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.16.4
 # k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.16.4

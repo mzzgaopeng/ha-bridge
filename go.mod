@@ -2,7 +2,6 @@ module ha-bridge
 
 go 1.18
 
-// replace k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
 replace github.com/googleapis/gnostic => github.com/googleapis/gnostic v0.3.1
 
 //replace cmos.chinamobile.com/ip-fixed => ./vendor/cmos.chinamobile.com/ip-fixed
@@ -10,11 +9,13 @@ replace github.com/googleapis/gnostic => github.com/googleapis/gnostic v0.3.1
 replace (
 	cmos.chinamobile.com/ip-fixed => ./cmos.chinamobile.com/ip-fixed
 	github.com/go-kit/kit => github.com/go-kit/kit v0.3.0
+	github.com/golang/glog => ./src/github.com/golang/glog
 
 	github.com/openshift/api => github.com/openshift/api v0.0.0-20191219222812-2987a591a72c
 	github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20191125132246-f6563a70e19a
 
 	github.com/operator-framework/operator-lifecycle-manager => github.com/operator-framework/operator-lifecycle-manager v0.0.0-20190128024246-5eb7ae5bdb7a
+
 	k8s.io/api => k8s.io/api v0.16.4
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.16.4
 	k8s.io/apimachinery => k8s.io/apimachinery v0.16.4
@@ -27,7 +28,7 @@ replace (
 	k8s.io/component-base => k8s.io/component-base v0.16.4
 	k8s.io/cri-api => k8s.io/cri-api v0.16.4
 	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.16.4
-	//k8s.io/klog => k8s.io/klog v2.6.0
+	k8s.io/klog => k8s.io/klog v0.4.0
 	k8s.io/klog/v2 => k8s.io/klog/v2 v2.6.0
 	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.16.4
 	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.16.4
@@ -55,15 +56,20 @@ require (
 	k8s.io/api v0.19.0-rc.2
 	k8s.io/apimachinery v0.19.0-rc.2
 	k8s.io/client-go v12.0.0+incompatible
-	//k8s.io/klog/v2 v2.2.0
-	k8s.io/klog/v2 v2.6.0
 	kubevirt.io/client-go v0.36.0
 //kubevirt.io/client-go v0.36.0
 )
 
-require cmos.chinamobile.com/ip-fixed v0.0.0-00010101000000-000000000000
+require (
+	cmos.chinamobile.com/ip-fixed v0.0.0-00010101000000-000000000000
+	k8s.io/klog/v2 v2.2.0
+)
 
-require github.com/go-stack/stack v1.8.0 // indirect
+require (
+	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
+	k8s.io/klog v1.0.0 // indirect
+)
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
@@ -79,7 +85,7 @@ require (
 	github.com/go-openapi/spec v0.19.3 // indirect
 	github.com/go-openapi/swag v0.19.5 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
+	//github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.5 // indirect
@@ -111,7 +117,6 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	k8s.io/apiextensions-apiserver v0.19.0-rc.2 // indirect
-	k8s.io/klog v1.0.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20200410145947-61e04a5be9a6 // indirect
 	k8s.io/utils v0.0.0-20200720150651-0bdb4ca86cbc // indirect
 	kubevirt.io/containerized-data-importer v1.26.1 // indirect
