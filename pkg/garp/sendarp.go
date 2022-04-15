@@ -4,7 +4,7 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
-	log "k8s.io/klog/v2"
+	"k8s.io/klog/v2"
 	"net"
 	"sync"
 )
@@ -44,15 +44,16 @@ func SendAFakeArpRequest(handle *pcap.Handle, dstIP, srcIP net.IP, dstMac, srcMa
 		arpLayer,
 	)
 	if err != nil {
-		log.Error(err)
+		klog.Error(err)
 	}
 	outgoingPacket := buffer.Bytes()
-	log.Infoln("sending arp")
+	klog.Infof("sending arp: %s", srcIP)
 	//log.Infoln(hex.Dump(outgoingPacket))
 	handleMutex.Lock()
 	err = handle.WritePacketData(outgoingPacket)
 	handleMutex.Unlock()
 	if err != nil {
-		log.Error(err)
+		klog.Error(err)
 	}
 }
+
