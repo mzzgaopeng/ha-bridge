@@ -47,7 +47,7 @@ func SendAFakeArpRequest(handle *pcap.Handle, dstIP, srcIP net.IP, dstMac, srcMa
 		klog.Error(err)
 	}
 	outgoingPacket := buffer.Bytes()
-	klog.Infoln("sending arp")
+	klog.Infof("sending arp: %s", srcIP)
 	//log.Infoln(hex.Dump(outgoingPacket))
 	handleMutex.Lock()
 	err = handle.WritePacketData(outgoingPacket)
@@ -56,3 +56,4 @@ func SendAFakeArpRequest(handle *pcap.Handle, dstIP, srcIP net.IP, dstMac, srcMa
 		klog.Error(err)
 	}
 }
+

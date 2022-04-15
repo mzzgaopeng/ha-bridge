@@ -53,6 +53,19 @@ func sendGarp(macstr, ipstr, linkBridgeOnHost string) {
 	garp.SendAFakeArpRequest(handle, src, src, broadcastMac, mac)
 }
 
+func sendNdp(macstr, ip6str, linkBridgeOnHost string) {
+
+	ndp, err := garp.NewNDPResponder(linkBridgeOnHost, macstr)
+	if err != nil {
+		klog.Fatalf("failed to create new NDP Responder")
+	}
+	if ndp != nil {
+		defer ndp.Close()
+	}
+	ndp.SendGratuitous(ip6str)
+
+}
+
 func getAllLocalVMList() []v1.VirtualMachineInstance {
 	var result []v1.VirtualMachineInstance
 	obj, err := VirtInformer.GetIndexer().ByIndex(indexName, HOST_NAME)
@@ -77,7 +90,7 @@ func getipvlan(ip string) (string, error) {
 		result := strconv.Itoa(obj[0].(*v2.IPRecorder).IPLists[0].Vlan)
 		return result, nil
 	} else {
-		return ip, fmt.Errorf("coun't find ip is %s", ip)
+		return ip, fmt.Errorf("coun't find ip with vmi")
 	}
 }
 
@@ -85,7 +98,7 @@ func getipvlan(ip string) (string, error) {
 func getBridgeOnHOst(ip string) string {
 	vlanid, err := getipvlan(ip)
 	if err != nil {
-		klog.Fatal(err)
+		klog.Errorln(err)
 	}
 	result := fmt.Sprint("vlan", vlanid)
 	return result
@@ -107,6 +120,9 @@ func handleVMI(vmList []v1.VirtualMachineInstance) {
 					switch Ipfamily {
 					case 4:
 						go sendGarp(mac, vmip, linkBridgeOnHost)
+					case 6:
+						go sendNdp(mac, vmip, linkBridgeOnHost)
+
 					}
 				}
 				//linkBridgeOnHost := getBridgeOnHOst(hasVlanip)
@@ -126,8 +142,11 @@ func ipfamily(s string) int {
 		case '.':
 			return 4
 		case ':':
-			return 6
+			if s[0:4] != "fe80" {
+				return 6
+			}
 		}
 	}
 	return 0
 }
+
