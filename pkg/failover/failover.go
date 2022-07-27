@@ -108,9 +108,9 @@ func handleVMI(vmList []v1.VirtualMachineInstance) {
 	for _, vm := range vmList {
 		klog.Infoln("get vm  ", vm.Name)
 		for _, intf := range vm.Status.Interfaces {
-			if intf.InterfaceName == "eth0" {
-				//if strings.Contains(intf.InterfaceName, "eth") {
-				klog.Infoln("get vm has eth0  ", vm.Name)
+			if intf.Name == vm.Spec.Domain.Devices.Interfaces[0].Name {
+				//通过判断status李的name是否与spec下定义的一样来判断
+				klog.Infof("This vm name is : %s , interface name is :  %s", vm.Name, intf.InterfaceName)
 				mac := intf.MAC
 				hasVlanip := intf.IP
 				ip := intf.IPs
@@ -149,4 +149,3 @@ func ipfamily(s string) int {
 	}
 	return 0
 }
-
